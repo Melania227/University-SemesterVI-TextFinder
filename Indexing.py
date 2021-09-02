@@ -2,6 +2,10 @@ import re
 import os
 from collections import Counter
 
+def takePath():
+    path = input("Indique el path donde se encuentra su archivo y el nombre del mismo: ")
+    return path
+
 #Funcion que abre y lee y retorna el texto de un archivo
 def readFile(path):
     route, extension = os.path.splitext(path)
@@ -50,23 +54,30 @@ def wordsInTextList(wordList):
 def wordAppearances(list):
     return Counter(list).most_common()
 
-#Text Input
-text = readFile("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/xml-es/apx-authors.xml")
 
-#Text format
-text = deleteTags(text)
-text = deletePunctuation(text)
-text = deleteSpecialCharacters(text)
-text = deleteSpecialCharacters(text)
+#Funcion principal
+def wordIndexOfDocumet(path):
+    #Text Input
+    #text = readFile(path)
+    text = readFile("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/xml-es/apx-authors.xml")
 
-#Final format list
-wordList = splitText(text)
+    #Text format
+    text = deleteTags(text)
+    text = deletePunctuation(text)
+    text = deleteSpecialCharacters(text)
+    text = deleteSpecialCharacters(text)
 
-stopwordsList = ["a", "ante", "bajo", "cabe", "con", "contra", "de", "desde", "e", "el", "en", "entre", "hacia", "hasta", "ni", "la", "le", "lo", "los", "las", "o", "para", "pero", "por", "que", "se", "segun", "sin", "so", "sobre", "tras", "u", "un", "una", "unas", "uno", "unos", "y"]
-wordList = stopwords(stopwordsList,wordList)
+    #Final format list
+    wordList = splitText(text)
 
-#wordList = wordsInTextList(wordList)
-wordList.sort()
+    stopwordsList = ["a", "ante", "bajo", "cabe", "con", "contra", "de", "desde", "e", "el", "en", "entre", "hacia", "hasta", "ni", "la", "le", "lo", "los", "las", "o", "para", "pero", "por", "que", "se", "segun", "sin", "so", "sobre", "tras", "u", "un", "una", "unas", "uno", "unos", "y"]
+    wordList = stopwords(stopwordsList,wordList)
 
-wordIndex = wordAppearances(wordList)
-print(wordIndex)
+    #wordList = wordsInTextList(wordList)
+    wordList.sort()
+
+    wordIndex = wordAppearances(wordList)
+    print(wordIndex)
+
+path = takePath()
+wordIndexOfDocumet(path)
