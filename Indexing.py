@@ -16,10 +16,28 @@ def readFile(path):
         return content
     return ""
 
-#Funcion que elimina los signos de puntuacion del texto y los cambia por un espacio en blanco
-def deletePunctuation(text):
+#Funcion que elimina los tags XML del texto y los cambia por un espacio en blanco
+def deleteTags(text):
     return re.sub(r'\<(.*?)\>',' ',text)
 
-text="<MEMBER>Seth Alves: <EMAIL>alves@helixcode.com</EMAIL></MEMBER>"
-text2 = readFile("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/xml-es/apx-authors.xml")
-print(deletePunctuation(text2))
+#Funcion que elimina los signos de puntuacion del texto y los cambia por un espacio en blanco
+def deletePunctuation(text):
+    return re.sub(r'[\W]+',' ',text)
+
+#Funcion que elimina los caracteres especiales, por ejemplo, las tildes
+def deleteSpecialCharacters(text):
+    text=text.lower()
+    mapTable = text.maketrans("áéíóúü", "aeiouu")
+    text = text.translate(mapTable)
+    return str(text)
+
+#Eliminar stopwords
+def stopwords(list, text):
+    return ''
+
+text = readFile("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/xml-es/apx-authors.xml")
+text=deleteTags(text)
+text=deletePunctuation(text)
+text=deleteSpecialCharacters(text)
+print(deleteSpecialCharacters(text))
+#stopwords(["a","ante","bajo","cabe","con","contra","de","desde"],text)
