@@ -41,16 +41,25 @@ def stopwords(stopwordsList, wordList):
         while stopWord in wordList: wordList.remove(stopWord)
     return wordList   
 
+#Funcion la lista de palabras y quita duplicados
+def wordsInTextList(wordList):
+	return list(set(wordList))
 
+#Text Input
 text = readFile("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/xml-es/apx-authors.xml")
+
+#Text format
 text = deleteTags(text)
 text = deletePunctuation(text)
 text = deleteSpecialCharacters(text)
 text = deleteSpecialCharacters(text)
+
+#Final format list
 wordList = splitText(text)
-print(wordList)
 
 stopwordsList = ["a", "ante", "bajo", "cabe", "con", "contra", "de", "desde", "e", "el", "en", "entre", "hacia", "hasta", "ni", "la", "le", "lo", "los", "las", "o", "para", "pero", "por", "que", "se", "segun", "sin", "so", "sobre", "tras", "u", "un", "una", "unas", "uno", "unos", "y"]
-
 wordList = stopwords(stopwordsList,wordList)
+
+wordList = wordsInTextList(wordList)
+wordList.sort()
 print(wordList)
