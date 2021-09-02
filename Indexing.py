@@ -1,5 +1,6 @@
 import re
 import os
+from collections import Counter
 
 #Funcion que abre y lee y retorna el texto de un archivo
 def readFile(path):
@@ -45,6 +46,10 @@ def stopwords(stopwordsList, wordList):
 def wordsInTextList(wordList):
 	return list(set(wordList))
 
+#Funcion que toma una lista de palabras y nos devuelve otra lista que contiene cada palabra y la cantidad de veces que aparece
+def wordAppearances(list):
+    return Counter(list).most_common()
+
 #Text Input
 text = readFile("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/xml-es/apx-authors.xml")
 
@@ -60,6 +65,8 @@ wordList = splitText(text)
 stopwordsList = ["a", "ante", "bajo", "cabe", "con", "contra", "de", "desde", "e", "el", "en", "entre", "hacia", "hasta", "ni", "la", "le", "lo", "los", "las", "o", "para", "pero", "por", "que", "se", "segun", "sin", "so", "sobre", "tras", "u", "un", "una", "unas", "uno", "unos", "y"]
 wordList = stopwords(stopwordsList,wordList)
 
-wordList = wordsInTextList(wordList)
+#wordList = wordsInTextList(wordList)
 wordList.sort()
-print(wordList)
+
+wordIndex = wordAppearances(wordList)
+print(wordIndex)
