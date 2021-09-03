@@ -21,13 +21,33 @@ def documentsInDirectory(ruta):
 
 
 #Procesa archivo por archivo para crear el archivo invertido y el track de documentos
-def processCollection(ruta):
-    rutas = documentsInDirectory("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas")
-    for r in rutas:
-        dictionary = dictionaryOfDocumet(path)
+def processCollection(path):
+    paths = documentsInDirectory("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas")
+    
+    print(paths)
+    for p in paths:
+        dictionary = dictionaryOfDocumet(p)
         keysOfDictionary = sorted(dictionary.keys())
+        frequencies = sumFrequencies(dictionary.values())
         print (dictionary)
-        print(dictionary.get(keysOfDictionary[0]))
+
+        collectionAux = {
+            'N':collection.get('N')+1,
+            'avgLen':collection.get('avgLen')+frequencies,
+            'ruta':path
+        }
+
+        collection.update(collectionAux)
+    
+    collectionAux = {
+        'N':collection.get('N'),
+        'avgLen':collection.get('avgLen')/collection.get('N'),
+        'ruta':path
+    }
+
+    collection.update(collectionAux)
+
+    print (collection)
 
 #PROCESAMIENTO DEL DOCUMENTO
 documents={
@@ -87,12 +107,19 @@ def wordsInTextList(wordList):
 def wordAppearances(list):
     return Counter(list)
 
+#Funcion que toma todas las frecuencias y las suma
+def sumFrequencies(list):
+    result = 0
+    print(list)
+    for i in list: 
+        result+=i
+    return result
 
 #Funcion principal
 def dictionaryOfDocumet(path):
     #Text Input
     #text = readFile(path)
-    text = readFile("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/xml-es/apx-authors.xml")
+    text = readFile(path)
 
     #Text format
     text = deleteTags(text)
