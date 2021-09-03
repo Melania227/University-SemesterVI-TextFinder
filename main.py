@@ -18,6 +18,9 @@ collection = {
 documents={
 }
 
+collectionDictionary={
+}
+
 #Toma todos los paths de los documentos en una coleccion
 def documentsInDirectory(ruta):
     return [f for f in os.listdir(ruta) if os.path.isfile(os.path.join(ruta, f))]
@@ -28,12 +31,13 @@ def processCollection(path):
     path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas"
     paths = documentsInDirectory(path)
     
-    print(paths)
     for p in paths:
         dictionary = dictionaryOfDocumet(path+"/"+p)
         keysOfDictionary = sorted(dictionary.keys())
         frequencies = sumFrequencies(dictionary.values())
-        print (dictionary)
+        #print (dictionary)
+        #print("///////////////////////////////////////////////////////////")
+        #print(keysOfDictionary)
 
         #Update collection
         collectionAux = {
@@ -50,6 +54,9 @@ def processCollection(path):
             'norma':"",
         }
         documents[collection.get('N')] = documentData
+
+        #Update collection dictionary
+        updateCollectionDictionary(dictionary, keysOfDictionary)
     
     collectionAux = {
         'N':collection.get('N'),
@@ -60,7 +67,40 @@ def processCollection(path):
     collection.update(collectionAux)
 
     print (collection)
+    print("///////////////////////////////////////////////////////////")
     print (documents)
+    print("///////////////////////////////////////////////////////////")
+    print(collectionDictionary)
+
+def updateCollectionDictionary(dictionary, keys):
+    for term in keys:
+        if term in collectionDictionary:
+            termAux = collectionDictionary[term]
+            #termAux = 
+            termInCollectionDictionary={
+                'ni':termAux['ni']+1,
+                'idfs':"",
+                'postings':{},
+            }
+            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term])
+            collectionDictionary[term]=termInCollectionDictionary
+        else:
+            termInCollectionDictionary={
+                'ni':1,
+                'idfs':"",
+                'postings':{},
+            }
+            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term])
+            collectionDictionary[term]=termInCollectionDictionary
+        
+
+def createPosting(term):
+    postingAux={
+        'd':collection['N'],
+        'freq':term,
+        'peso':0
+    }
+    return postingAux
 
 #PROCESAMIENTO DEL DOCUMENTO
 
@@ -116,7 +156,6 @@ def wordAppearances(list):
 #Funcion que toma todas las frecuencias y las suma
 def sumFrequencies(list):
     result = 0
-    print(list)
     for i in list: 
         result+=i
     return result
