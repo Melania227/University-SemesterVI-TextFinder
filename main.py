@@ -15,29 +15,41 @@ collection = {
     'ruta':""
 }
 
+documents={
+}
+
 #Toma todos los paths de los documentos en una coleccion
 def documentsInDirectory(ruta):
-    return [ruta+"/"+f for f in os.listdir(ruta) if os.path.isfile(os.path.join(ruta, f))]
+    return [f for f in os.listdir(ruta) if os.path.isfile(os.path.join(ruta, f))]
 
 
 #Procesa archivo por archivo para crear el archivo invertido y el track de documentos
 def processCollection(path):
-    paths = documentsInDirectory("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas")
+    path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas"
+    paths = documentsInDirectory(path)
     
     print(paths)
     for p in paths:
-        dictionary = dictionaryOfDocumet(p)
+        dictionary = dictionaryOfDocumet(path+"/"+p)
         keysOfDictionary = sorted(dictionary.keys())
         frequencies = sumFrequencies(dictionary.values())
         print (dictionary)
 
+        #Update collection
         collectionAux = {
             'N':collection.get('N')+1,
             'avgLen':collection.get('avgLen')+frequencies,
             'ruta':path
         }
-
         collection.update(collectionAux)
+
+        #Update documents
+        documentData={
+            'ruta':p,
+            'longuitud':frequencies,
+            'norma':"",
+        }
+        documents[collection.get('N')] = documentData
     
     collectionAux = {
         'N':collection.get('N'),
@@ -48,15 +60,9 @@ def processCollection(path):
     collection.update(collectionAux)
 
     print (collection)
+    print (documents)
 
 #PROCESAMIENTO DEL DOCUMENTO
-documents={
-    'd1':{
-        'ruta':"",
-        'longuitud':"",
-        'largo':"",
-    }
-}
 
 
 #Funcion que abre y lee y retorna el texto de un archivo
