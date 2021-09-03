@@ -1,10 +1,43 @@
+from collections import Counter
+from collections import OrderedDict
 import re
 import os
-from collections import Counter
+
 
 def takePath():
     path = input("Indique el path donde se encuentra su archivo y el nombre del mismo: ")
     return path
+
+#PROCESAMIENTO DE LA COLECCION
+collection = {
+    'N':0,
+    'avgLen':0,
+    'ruta':""
+}
+
+#Toma todos los paths de los documentos en una coleccion
+def documentsInDirectory(ruta):
+    return [ruta+"/"+f for f in os.listdir(ruta) if os.path.isfile(os.path.join(ruta, f))]
+
+
+#Procesa archivo por archivo para crear el archivo invertido y el track de documentos
+def processCollection(ruta):
+    rutas = documentsInDirectory("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas")
+    for r in rutas:
+        dictionary = dictionaryOfDocumet(path)
+        keysOfDictionary = sorted(dictionary.keys())
+        print (dictionary)
+        print(dictionary.get(keysOfDictionary[0]))
+
+#PROCESAMIENTO DEL DOCUMENTO
+documents={
+    'd1':{
+        'ruta':"",
+        'longuitud':"",
+        'largo':"",
+    }
+}
+
 
 #Funcion que abre y lee y retorna el texto de un archivo
 def readFile(path):
@@ -50,13 +83,13 @@ def stopwords(stopwordsList, wordList):
 def wordsInTextList(wordList):
 	return list(set(wordList))
 
-#Funcion que toma una lista de palabras y nos devuelve otra lista que contiene cada palabra y la cantidad de veces que aparece
+#Funcion que toma una lista de palabras y nos devuelve un diccionario que contiene cada palabra y la cantidad de veces que aparece
 def wordAppearances(list):
-    return Counter(list).most_common()
+    return Counter(list)
 
 
 #Funcion principal
-def wordIndexOfDocumet(path):
+def dictionaryOfDocumet(path):
     #Text Input
     #text = readFile(path)
     text = readFile("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/xml-es/apx-authors.xml")
@@ -77,7 +110,7 @@ def wordIndexOfDocumet(path):
     wordList.sort()
 
     wordIndex = wordAppearances(wordList)
-    print(wordIndex)
+    return wordIndex
 
 path = takePath()
-wordIndexOfDocumet(path)
+processCollection(path)
