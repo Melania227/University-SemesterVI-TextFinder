@@ -1,5 +1,6 @@
 from collections import Counter
 from collections import OrderedDict
+from math import log, sqrt
 import re
 import os
 
@@ -35,9 +36,6 @@ def processCollection(path):
         dictionary = dictionaryOfDocumet(path+"/"+p)
         keysOfDictionary = sorted(dictionary.keys())
         frequencies = sumFrequencies(dictionary.values())
-        #print (dictionary)
-        #print("///////////////////////////////////////////////////////////")
-        #print(keysOfDictionary)
 
         #Update collection
         collectionAux = {
@@ -57,6 +55,7 @@ def processCollection(path):
 
         #Update collection dictionary
         updateCollectionDictionary(dictionary, keysOfDictionary)
+        updateDocuments()
     
     collectionAux = {
         'N':collection.get('N'),
@@ -76,31 +75,51 @@ def updateCollectionDictionary(dictionary, keys):
     for term in keys:
         if term in collectionDictionary:
             termAux = collectionDictionary[term]
-            #termAux = 
+            idfTemp = getIdf(termAux['ni']+1)
             termInCollectionDictionary={
                 'ni':termAux['ni']+1,
-                'idfs':"",
+                'idfs':idfTemp,
                 'postings':{},
             }
-            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term])
+            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term],termAux['ni']+1)
             collectionDictionary[term]=termInCollectionDictionary
         else:
+            idfTemp = getIdf(1)
             termInCollectionDictionary={
                 'ni':1,
-                'idfs':"",
+                'idfs':idfTemp,
                 'postings':{},
             }
-            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term])
+            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term], 1)
             collectionDictionary[term]=termInCollectionDictionary
         
 
-def createPosting(term):
+def createPosting(term, ni):
     postingAux={
         'd':collection['N'],
         'freq':term,
-        'peso':0
+        'peso':log((1+term),2) * log((collection['N']/ni),2)
     }
     return postingAux
+
+def getIdf(ni):
+    tempIdf = log(((collection['N']-ni)+0.5)/(ni+0.5))
+    if tempIdf < 0:
+        return 0
+    return tempIdf
+
+def updateDocuments():
+    pesosTemp = []
+    for term in collectionDictionary:
+        if collection.get('N') in collectionDictionary[term]['postings']:
+            pesosTemp += [collectionDictionary[term]['postings'][collection.get('N')]['peso']]
+    documents[collection.get('N')]['norma'] = calculateNorma(pesosTemp)
+
+def calculateNorma(pesosTemp):
+    sum = 0
+    for peso in pesosTemp:
+        sum += pow(peso,2)
+    return sqrt(sum)
 
 #PROCESAMIENTO DEL DOCUMENTO
 
