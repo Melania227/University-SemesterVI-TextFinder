@@ -55,7 +55,7 @@ def processCollection(path):
 
         #Update collection dictionary
         updateCollectionDictionary(dictionary, keysOfDictionary)
-        updateDocuments()
+        
     
     collectionAux = {
         'N':collection.get('N'),
@@ -69,60 +69,83 @@ def processCollection(path):
     print("///////////////////////////////////////////////////////////")
     print (documents)
     print("///////////////////////////////////////////////////////////")
-    print(collectionDictionary)
+    calculate()
+    #print(collectionDictionary)
 
 def updateCollectionDictionary(dictionary, keys):
     for term in keys:
         if term in collectionDictionary:
             termAux = collectionDictionary[term]
-            idfTemp = getIdf(termAux['ni']+1)
             termInCollectionDictionary={
                 'ni':termAux['ni']+1,
-                'idfs':idfTemp,
+                'idfs':0,
                 'postings':{},
             }
-            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term],termAux['ni']+1)
+            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term])
             collectionDictionary[term]=termInCollectionDictionary
         else:
-            idfTemp = getIdf(1)
             termInCollectionDictionary={
                 'ni':1,
-                'idfs':idfTemp,
+                'idfs':0,
                 'postings':{},
             }
-            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term], 1)
+            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term])
             collectionDictionary[term]=termInCollectionDictionary
         
 
-def createPosting(term, ni):
+def createPosting(term):
     postingAux={
         'd':collection['N'],
         'freq':term,
-        'peso':log((1+term),2) * log((collection['N']/ni),2)
+        'peso':0
     }
     return postingAux
 
-def getIdf(ni):
-    tempIdf = log(((collection['N']-ni)+0.5)/(ni+0.5))
-    if tempIdf < 0:
-        return 0
-    return tempIdf
+def getIdf():
+    N = collection['N']
+    for term in collectionDictionary:
+        ni = collectionDictionary[term]['ni']
+        tempIdf = log(((N-ni)+0.5)/(ni+0.5))
+        if tempIdf < 0:
+            collectionDictionary['idfs'] = 0
+        collectionDictionary['idfs'] = tempIdf
 
 def updateDocuments():
     pesosTemp = []
-    for term in collectionDictionary:
-        if collection.get('N') in collectionDictionary[term]['postings']:
-            pesosTemp += [collectionDictionary[term]['postings'][collection.get('N')]['peso']]
-    documents[collection.get('N')]['norma'] = calculateNorma(pesosTemp)
+    for i in range [1:collection.get('N')+1]:
+        for term in collectionDictionary:
+            if i in collectionDictionary[term]['postings']:
+                pesosTemp += [collectionDictionary[term]['postings'][i]['peso']]
+        documents[i]['norma'] = calculateNorma(pesosTemp)
 
 def calculateNorma(pesosTemp):
     sum = 0
+    print(pesosTemp)
     for peso in pesosTemp:
         sum += pow(peso,2)
     return sqrt(sum)
 
-#PROCESAMIENTO DEL DOCUMENTO
+def calculateWeight():
+    for term in collectionDictionary:
+        ni = collectionDictionary[term]['ni']
+        for post in collectionDictionary[term]['postings']:
+            frequency = collectionDictionary[term]['postings'][post]['freq']
+            collectionDictionary[term]['postings'][post]['peso'] = log((1+frequency),2)* log((collection['N']/ni),2)
 
+
+#Funcion que calcula los pesos, los idfs y la norma
+def calculate():
+    #Peso
+    calculateWeight()
+
+    #IDF    
+    getIdf()
+    
+    #Norma
+    updateDocuments()
+
+
+#PROCESAMIENTO DEL DOCUMENTO
 
 #Funcion que abre y lee y retorna el texto de un archivo
 def readFile(path):
