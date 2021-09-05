@@ -64,7 +64,7 @@ def processCollection(path):
     }
 
     collection.update(collectionAux)
-
+    
     calculateWeight()
     
     #IDF    
@@ -72,7 +72,6 @@ def processCollection(path):
 
     #Norma
     updateDocuments()
-
 
     print (collection)
     print("///////////////////////////////////////////////////////////")
@@ -107,25 +106,25 @@ def createPosting(term):
 
 def getIdf():
     N = collection['N']
-    for term in collectionDictionary.copy():
+    for term in collectionDictionary:
         ni = collectionDictionary[term]['ni']
-        tempIdf = log(((N-ni)+0.5)/(ni+0.5))
+        tempIdf = log((N-ni+0.5)/(ni+0.5),10)
         if tempIdf < 0:
-            collectionDictionary[term]['idfs'] = 0
+          collectionDictionary[term]['idfs'] = 0
         else:
-            collectionDictionary[term]['idfs'] = tempIdf
+           collectionDictionary[term]['idfs'] = tempIdf
 
 def updateDocuments():
-    pesosTemp = []
     for i in range (1,collection.get('N')+1):
+        pesosTemp = []
         for term in collectionDictionary.copy():
-            if i in collectionDictionary[term]['postings']: ##AIUDA MAMA ESTE IF NO TIENE SENTIDO
+            if i in collectionDictionary[term]['postings']: 
                 pesosTemp += [collectionDictionary[term]['postings'][i]['peso']]
         documents[i]['norma'] = calculateNorma(pesosTemp)
     
+    
 def calculateNorma(pesosTemp):
     sum = 0
-   # print(pesosTemp)
     for peso in pesosTemp:
         sum += pow(peso,2)
     return sqrt(sum)
@@ -157,11 +156,11 @@ def readFile(path):
 
 #Funcion que elimina los tags XML del texto y los cambia por un espacio en blanco
 def deleteTags(text):
-    return re.sub(r'\<(.*?)\>',' ',text)
+    return re.sub('\<(.*?)\>',' ',text)
 
 #Funcion que elimina los signos de puntuacion del texto y los cambia por un espacio en blanco
 def deletePunctuation(text):
-    return re.sub(r'[\W]+',' ',text)
+    return re.sub('[\W]+',' ',text)
 
 #Funcion que elimina los caracteres especiales, por ejemplo, las tildes
 def deleteAccent(text):
@@ -221,3 +220,4 @@ def dictionaryOfDocument(path):
 
 path = takePath()
 processCollection(path)
+
