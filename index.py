@@ -1,5 +1,6 @@
 from collections import Counter
 from collections import OrderedDict
+from FileManager import FileManager
 from math import log, sqrt
 import re
 import os
@@ -29,7 +30,8 @@ def documentsInDirectory(ruta):
 
 #Procesa archivo por archivo para crear el archivo invertido y el track de documentos
 def processCollection(path):
-    path="C:/Users/Laptop/OneDrive/Documentos/Sexto Semestre/RECUPERACION DE INFORMACION TEXTUAL/Pruebas"
+    #path="C:/Users/Laptop/OneDrive/Documentos/Sexto Semestre/RECUPERACION DE INFORMACION TEXTUAL/Pruebas"
+    path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas"
     paths = documentsInDirectory(path)
     
     for p in paths:
@@ -139,21 +141,6 @@ def calculateWeight():
 
 #PROCESAMIENTO DEL DOCUMENTO
 
-#Funcion que abre y lee y retorna el texto de un archivo
-def readFile(path):
-    route, extension = os.path.splitext(path)
-    if(extension==".xml" or extension==".XML"):    
-        try:
-            with open(path, encoding='utf-8') as file:
-                content=file.read()
-                file.close()
-        except:
-            with open(path,"r") as file:
-                content=file.read()
-                file.close()
-        return content
-    return ""
-
 #Funcion que elimina los tags XML del texto y los cambia por un espacio en blanco
 def deleteTags(text):
     return re.sub('\<(.*?)\>',' ',text)
@@ -198,7 +185,7 @@ def sumFrequencies(list):
 def dictionaryOfDocument(path):
     #Text Input
     #text = readFile(path)
-    text = readFile(path)
+    text = FileManager.readFile(path)
 
     #Text format
     text = deleteTags(text)
@@ -220,4 +207,3 @@ def dictionaryOfDocument(path):
 
 path = takePath()
 processCollection(path)
-
