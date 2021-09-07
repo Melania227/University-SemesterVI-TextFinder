@@ -1,4 +1,5 @@
 import os
+import pickle
 
 class FileManager:
 
@@ -23,6 +24,19 @@ class FileManager:
         file = open(path, "w")
         file.write(text)
         file.close()
+
+    #Funcion que guarda un diccionario en un archivo
+    def writeDictionary(path, name, dict):
+        outfile = open(path+'/'+name, 'wb')
+        pickle.dump(dict, outfile)
+        outfile.close()
+
+    #Funcion que lee un diccionario de un archivo
+    def readDictionary(path):
+        infile = open(path,'rb')
+        new_dict = pickle.load(infile)
+        infile.close()
+        return new_dict
 
 
 
