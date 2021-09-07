@@ -29,13 +29,14 @@ def documentsInDirectory(ruta):
 
 #Procesa archivo por archivo para crear el archivo invertido y el track de documentos
 def processCollection(path):
-    path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas"
+    path="C:/Users/Laptop/OneDrive/Documentos/Sexto Semestre/RECUPERACION DE INFORMACION TEXTUAL/Pruebas"
     paths = documentsInDirectory(path)
     
     for p in paths:
-        dictionary = dictionaryOfDocumet(path+"/"+p)
+        dictionary = dictionaryOfDocument(path+"/"+p)
         keysOfDictionary = sorted(dictionary.keys())
         frequencies = sumFrequencies(dictionary.values())
+        
 
         #Update collection
         collectionAux = {
@@ -55,7 +56,6 @@ def processCollection(path):
 
         #Update collection dictionary
         updateCollectionDictionary(dictionary, keysOfDictionary)
-        
     
     collectionAux = {
         'N':collection.get('N'),
@@ -64,34 +64,37 @@ def processCollection(path):
     }
 
     collection.update(collectionAux)
+    
+    calculateWeight()
+    
+    #IDF    
+    getIdf()
+
+    #Norma
+    updateDocuments()
 
     print (collection)
     print("///////////////////////////////////////////////////////////")
     print (documents)
     print("///////////////////////////////////////////////////////////")
-    calculate()
-    #print(collectionDictionary)
+    print(collectionDictionary)
 
 def updateCollectionDictionary(dictionary, keys):
     for term in keys:
         if term in collectionDictionary:
-            termAux = collectionDictionary[term]
-            termInCollectionDictionary={
-                'ni':termAux['ni']+1,
-                'idfs':0,
-                'postings':{},
-            }
-            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term])
-            collectionDictionary[term]=termInCollectionDictionary
+            collectionDictionary[term]['ni'] += 1
+            posting = createPosting(dictionary[term])
+            collectionDictionary[term]['postings'].update({collection['N']:posting})
         else:
             termInCollectionDictionary={
                 'ni':1,
                 'idfs':0,
                 'postings':{},
             }
-            termInCollectionDictionary['postings'][collection['N']]=createPosting(dictionary[term])
+            posting = createPosting(dictionary[term])
+            termInCollectionDictionary['postings'][collection['N']] =  posting
             collectionDictionary[term]=termInCollectionDictionary
-        
+    
 
 def createPosting(term):
     postingAux={
@@ -105,22 +108,23 @@ def getIdf():
     N = collection['N']
     for term in collectionDictionary:
         ni = collectionDictionary[term]['ni']
-        tempIdf = log(((N-ni)+0.5)/(ni+0.5))
+        tempIdf = log((N-ni+0.5)/(ni+0.5),10)
         if tempIdf < 0:
-            collectionDictionary['idfs'] = 0
-        collectionDictionary['idfs'] = tempIdf
+          collectionDictionary[term]['idfs'] = 0
+        else:
+           collectionDictionary[term]['idfs'] = tempIdf
 
 def updateDocuments():
-    pesosTemp = []
-    for i in range [1:collection.get('N')+1]:
-        for term in collectionDictionary:
-            if i in collectionDictionary[term]['postings']:
+    for i in range (1,collection.get('N')+1):
+        pesosTemp = []
+        for term in collectionDictionary.copy():
+            if i in collectionDictionary[term]['postings']: 
                 pesosTemp += [collectionDictionary[term]['postings'][i]['peso']]
         documents[i]['norma'] = calculateNorma(pesosTemp)
-
+    
+    
 def calculateNorma(pesosTemp):
     sum = 0
-    print(pesosTemp)
     for peso in pesosTemp:
         sum += pow(peso,2)
     return sqrt(sum)
@@ -131,18 +135,6 @@ def calculateWeight():
         for post in collectionDictionary[term]['postings']:
             frequency = collectionDictionary[term]['postings'][post]['freq']
             collectionDictionary[term]['postings'][post]['peso'] = log((1+frequency),2)* log((collection['N']/ni),2)
-
-
-#Funcion que calcula los pesos, los idfs y la norma
-def calculate():
-    #Peso
-    calculateWeight()
-
-    #IDF    
-    getIdf()
-    
-    #Norma
-    updateDocuments()
 
 
 #PROCESAMIENTO DEL DOCUMENTO
@@ -164,14 +156,14 @@ def readFile(path):
 
 #Funcion que elimina los tags XML del texto y los cambia por un espacio en blanco
 def deleteTags(text):
-    return re.sub(r'\<(.*?)\>',' ',text)
+    return re.sub('\<(.*?)\>',' ',text)
 
 #Funcion que elimina los signos de puntuacion del texto y los cambia por un espacio en blanco
 def deletePunctuation(text):
-    return re.sub(r'[\W]+',' ',text)
+    return re.sub('[\W]+',' ',text)
 
 #Funcion que elimina los caracteres especiales, por ejemplo, las tildes
-def deleteSpecialCharacters(text):
+def deleteAccent(text):
     text=text.lower()
     mapTable = text.maketrans("áéíóúü", "aeiouu")
     text = text.translate(mapTable)
@@ -203,7 +195,7 @@ def sumFrequencies(list):
     return result
 
 #Funcion principal
-def dictionaryOfDocumet(path):
+def dictionaryOfDocument(path):
     #Text Input
     #text = readFile(path)
     text = readFile(path)
@@ -211,8 +203,7 @@ def dictionaryOfDocumet(path):
     #Text format
     text = deleteTags(text)
     text = deletePunctuation(text)
-    text = deleteSpecialCharacters(text)
-    text = deleteSpecialCharacters(text)
+    text = deleteAccent(text)
 
     #Final format list
     wordList = splitText(text)
@@ -224,7 +215,9 @@ def dictionaryOfDocumet(path):
     wordList.sort()
 
     wordIndex = wordAppearances(wordList)
+    
     return wordIndex
 
 path = takePath()
 processCollection(path)
+
