@@ -1,5 +1,6 @@
 from collections import Counter
 from collections import OrderedDict
+from posixpath import splitext
 from FileManager import FileManager
 from math import log, sqrt
 import re
@@ -181,10 +182,16 @@ def sumFrequencies(list):
         result+=i
     return result
 
+#Funcion que toma los stopwords de un archivo y los procesaa en una lista
+def getStopwords(path):
+    text = FileManager.readFile(path)
+    text = re.sub('\n+|\s+',',',text)
+    text = text.split(",")
+    return text
+
 #Funcion principal
 def dictionaryOfDocument(path):
     #Text Input
-    #text = readFile(path)
     text = FileManager.readFile(path)
 
     #Text format
@@ -195,10 +202,11 @@ def dictionaryOfDocument(path):
     #Final format list
     wordList = splitText(text)
 
-    stopwordsList = ["a", "ante", "bajo", "cabe", "con", "contra", "de", "desde", "e", "el", "en", "entre", "hacia", "hasta", "ni", "la", "le", "lo", "los", "las", "o", "para", "pero", "por", "que", "se", "segun", "sin", "so", "sobre", "tras", "u", "un", "una", "unas", "uno", "unos", "y"]
+    stopwordsList = getStopwords("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas/stopwords.txt")
+
     wordList = stopwords(stopwordsList,wordList)
 
-    #wordList = wordsInTextList(wordList)
+    wordList = wordsInTextList(wordList)
     wordList.sort()
 
     wordIndex = wordAppearances(wordList)
