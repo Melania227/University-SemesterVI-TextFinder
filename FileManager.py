@@ -4,7 +4,7 @@ import pickle
 class FileManager:
 
     #def __init__(self):
-
+    
     
     #Funcion que abre y lee y retorna el texto de un archivo
     def readFile(path):
@@ -31,6 +31,7 @@ class FileManager:
         pickle.dump(dict, outfile)
         outfile.close()
 
+
     #Funcion que lee un diccionario de un archivo
     def readDictionary(path):
         infile = open(path,'rb')
@@ -38,7 +39,18 @@ class FileManager:
         infile.close()
         return new_dict
 
-
-
+    def getDocumentsInDirectory(self,path,list_,path_):
+        for f in os.listdir(path):
+            if os.path.isfile(os.path.join(path, f)):
+                if path_=="":
+                    list_+=[f]
+                else:
+                    list_+=[path_+"/"+f]
+            elif os.path.isdir(os.path.join(path, f)):
+                if path_=="":
+                    self.getDocumentsInDirectory(os.path.join(path, f),list_, f)
+                else:
+                    self.getDocumentsInDirectory(os.path.join(path, f),list_, path_+"/"+f)
+        return list_  
 
     

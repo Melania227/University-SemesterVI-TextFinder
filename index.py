@@ -27,26 +27,10 @@ class Index:
 
     #PROCESAMIENTO DE LA COLECCION
 
-    #Toma todos los paths de los documentos en una coleccion
-    def documentsInDirectory(self,ruta,lista,carpeta):
-        for f in os.listdir(ruta):
-            if os.path.isfile(os.path.join(ruta, f)):
-                if carpeta=="":
-                    lista+=[f]
-                else:
-                    lista+=[carpeta+"/"+f]
-            elif os.path.isdir(os.path.join(ruta, f)):
-                if carpeta=="":
-                    self.documentsInDirectory(os.path.join(ruta, f),lista, f)
-                else:
-                    self.documentsInDirectory(os.path.join(ruta, f),lista, carpeta+"/"+f)
-        return lista    
-
-
     #Procesa archivo por archivo para crear el archivo invertido y el track de documentos
     def processCollection(self, path, resultsPath, stopWordsPath):
         #path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas"
-        paths = self.documentsInDirectory(path,[],"")
+        paths = FileManager().getDocumentsInDirectory(path,[],"")
         
         for p in paths:
             dictionary = self.dictionaryOfDocument(path+"/"+p, stopWordsPath)

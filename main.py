@@ -1,6 +1,7 @@
 import shlex
 from index import Index
 from shlex import split
+from inspect_ import Inspect
 from FileManager import FileManager
 
 #index = Index()
@@ -69,15 +70,16 @@ def inspeccionMenu():
     print("Dato   -> ruta del archivo o el término que se quiere buscar")
     command = input("Ingrese el comando: ")
     parts = shlex.split(command)
-    Index().processCollection(parts[1], parts[1], parts[3]) if validate(parts,2) else print("Error")
+    Inspect(parts[1],parts[2],parts[3]).startInspection()
     return menu()
 
-def validate(command, type): 
+def validate(cmd, type): 
     if type == 1:
-        return True if (command[0] == "indizar" and len(command)==4) else False
+        return True if (cmd[0] == "indizar" and len(cmd)==4) else False
     elif type == 2:
-        return True if (command[0] == "buscar" and len(command)==6) else False 
+        return True if (cmd[0] == "buscar" and len(cmd)==6) else False 
     else:
-        return True if (command[0] == "mostrar" and len(command)==4) else False      
+        validWords = ["doc","ter"]
+        return True if (cmd[0] == "mostrar" and len(cmd)==4 and cmd[2] in validWords) else False      
 
 menu()
