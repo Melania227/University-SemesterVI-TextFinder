@@ -24,12 +24,8 @@ class Index:
 
         self.stopwordsList=[]
 
-    def takePath(self):
-        path = input("Indique el path donde se encuentra su archivo y el nombre del mismo: ")
-        return path
 
     #PROCESAMIENTO DE LA COLECCION
-    
 
     #Toma todos los paths de los documentos en una coleccion
     def documentsInDirectory(self,ruta,lista,carpeta):
@@ -48,13 +44,12 @@ class Index:
 
 
     #Procesa archivo por archivo para crear el archivo invertido y el track de documentos
-    def processCollection(self, path):
-        path="C:/Users/Laptop/OneDrive/Documentos/Sexto Semestre/RECUPERACION DE INFORMACION TEXTUAL/Pruebas"
+    def processCollection(self, path, resultsPath, stopWordsPath):
         #path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas"
         paths = self.documentsInDirectory(path,[],"")
         
         for p in paths:
-            dictionary = self.dictionaryOfDocument(path+"/"+p)
+            dictionary = self.dictionaryOfDocument(path+"/"+p, stopWordsPath)
             keysOfDictionary = sorted(dictionary.keys())
             frequencies = self.sumFrequencies(dictionary.values())
             
@@ -94,11 +89,13 @@ class Index:
         #Norma
         self.updateDocuments()
 
-        print (self.collection)
+        self.generateIndexDocuments(resultsPath)
+
+        #print (self.collection)
+        #print("///////////////////////////////////////////////////////////")
+        #print (self.documents)
         print("///////////////////////////////////////////////////////////")
-        print (self.documents)
-        print("///////////////////////////////////////////////////////////")
-        print(self.collectionDictionary)
+        #print(self.collectionDictionary)
 
     def updateCollectionDictionary(self, dictionary, keys):
         for term in keys:
@@ -157,6 +154,12 @@ class Index:
                 frequency = self.collectionDictionary[term]['postings'][post]['freq']
                 self.collectionDictionary[term]['postings'][post]['peso'] = log((1+frequency),2)* log((self.collection['N']/ni),2)
 
+    #Funcion que genera el archivo final con el index
+    def generateIndexDocuments(self, path):
+        FileManager.writeDictionary(path, "Collection Information.txt", self.collection)
+        FileManager.writeDictionary(path, "Documents Information.txt", self.documents)
+        FileManager.writeDictionary(path, "Dictionary Terms.txt", self.collectionDictionary)
+        FileManager.writeDictionary(path, "Stopwords.txt", self.stopwordsList)
 
     #PROCESAMIENTO DEL DOCUMENTO
 
@@ -207,8 +210,8 @@ class Index:
         text = text.split(",")
         return text
 
-    #Funcion principal
-    def dictionaryOfDocument(self, path):
+    #Funcion que hace el procesamiento de palabras (Termino, frecuencia)
+    def dictionaryOfDocument(self, path, stopWordsPath):
         #Text Input
         text = FileManager.readFile(path)
 
@@ -220,7 +223,8 @@ class Index:
         #Final format list
         wordList = self.splitText(text)
 
-        stopwordsList = self.getStopwords("C:/Users/Laptop/OneDrive/Documentos/Sexto Semestre/RECUPERACION DE INFORMACION TEXTUAL/terms.txt")
+        stopwordsList = self.getStopwords(stopWordsPath)
+        #stopwordsList = self.getStopwords("C:/Users/Laptop/OneDrive/Documentos/Sexto Semestre/RECUPERACION DE INFORMACION TEXTUAL/terms.txt")
         #stopwordsList = self.getStopwords("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas/stopwords.txt")
 
         wordList = self.stopwords(stopwordsList,wordList)
