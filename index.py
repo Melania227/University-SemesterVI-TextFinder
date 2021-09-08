@@ -24,9 +24,6 @@ class Index:
 
         self.stopwordsList=[]
 
-    def takePath(self):
-        path = input("Indique el path donde se encuentra su archivo y el nombre del mismo: ")
-        return path
 
     #PROCESAMIENTO DE LA COLECCION
 
@@ -227,6 +224,7 @@ class Index:
         wordList = self.splitText(text)
 
         stopwordsList = self.getStopwords(stopWordsPath)
+        #stopwordsList = self.getStopwords("C:/Users/Laptop/OneDrive/Documentos/Sexto Semestre/RECUPERACION DE INFORMACION TEXTUAL/terms.txt")
         #stopwordsList = self.getStopwords("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas/stopwords.txt")
 
         wordList = self.stopwords(stopwordsList,wordList)
