@@ -44,8 +44,8 @@ class Search:
         FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
         #Vamos a ir documento por documento: del 1 al número que nos dieron como entrada
         keys = list(self.documentsInfo.keys())[:int(self.baseData['numDocs'])]
+        queryNorm = self.getQueryNorm()
         for key in keys:
-            weightQueryForNorm=0
             sumProdWeights = 0 
             isInDictionary=False
             for word in self.baseData['query']:
@@ -55,15 +55,14 @@ class Search:
                         frequencyInCons = self.baseData['query'][word]
                         ni = self.dictionary[word]['ni']
                         weightQueryWord = log((1+frequencyInCons),2) * log((self.collectionInfo['N']/ni),2)
-                        weightQueryForNorm += weightQueryWord**2
                         weightQueryInDoc = self.dictionary[word]['postings'][key]['peso']
                         sumProdWeights += weightQueryWord*weightQueryInDoc
 
             if(isInDictionary):
-                queryNorm = sqrt(weightQueryForNorm)
-                print("NORMA DE LA CONSULTA " + str(queryNorm))
+                print("PARA EL DOC " + str(key))
+                print("SUMA PRODUCTO " + str(sumProdWeights))
                 print("NORMA DEL DOC " + str(self.documentsInfo[key]['norma']))
-                print("LO QUE DA 0 " + str(queryNorm*self.documentsInfo[key]['norma']))
+                print("NORMA DE LA CONSULTA " + str(queryNorm))
                 simTempDoc = (sumProdWeights/(queryNorm*self.documentsInfo[key]['norma']))
                 bisect.insort(self.docScale,(simTempDoc, "d"+str(key)))
             else:
@@ -101,6 +100,19 @@ class Search:
         
 
     #FUNCIONES SECUNDARIAS:
+
+    #Funcion que saca la norma de la consulta
+    def getQueryNorm(self):
+        weightQueryForNorm = 0 
+        for word in self.baseData['query']:
+            if word in self.dictionary:
+                frequencyInCons = self.baseData['query'][word]
+                ni = self.dictionary[word]['ni']
+                weightQueryWord = log((1+frequencyInCons),2) * log((self.collectionInfo['N']/ni),2)
+                print("Peso de la consulta " + str(weightQueryWord))
+                weightQueryForNorm += weightQueryWord**2
+        weightQueryForNorm = sqrt(weightQueryForNorm)
+        return weightQueryForNorm
 
     #Eliminar stopwords
     def deleteStopwords(self, stopwordsList, wordList):
