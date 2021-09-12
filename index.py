@@ -31,7 +31,9 @@ class Index:
     def processCollection(self, path, resultsPath, stopWordsPath):
         #path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas"
         paths = FileManager().getDocumentsInDirectory(path,[],"")
-        
+        regex = re.compile(r'.*\.xml')
+        paths = [ele for ele in paths if regex.match(ele)]
+        print(paths)
         for p in paths:
             dictionary = self.dictionaryOfDocument(path+"/"+p, stopWordsPath)
             keysOfDictionary = sorted(dictionary.keys())
@@ -208,8 +210,6 @@ class Index:
         wordList = self.splitText(text)
 
         self.stopwordsList = self.getStopwords(stopWordsPath)
-        #stopwordsList = self.getStopwords("C:/Users/Laptop/OneDrive/Documentos/Sexto Semestre/RECUPERACION DE INFORMACION TEXTUAL/terms.txt")
-        #stopwordsList = self.getStopwords("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas/stopwords.txt")
 
         wordList = self.stopwords(self.stopwordsList,wordList)
 

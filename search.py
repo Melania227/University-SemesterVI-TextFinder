@@ -92,7 +92,7 @@ class Search:
                     if key in self.dictionary[word]['postings']:
                         #isInDictionary=True
                         frequencyInDoc = self.dictionary[word]['postings'][key]['freq']
-                        idf = frequencyInDoc = self.dictionary[word]['idfs']
+                        idf = self.dictionary[word]['idfs']
                         ni = self.dictionary[word]['ni']
                         simTempDoc += idf * ((frequencyInDoc*(k+1))/(frequencyInDoc+k*(1-b+b*(documentSize/avgCollection))))
 
