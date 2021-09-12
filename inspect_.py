@@ -12,7 +12,13 @@ class Inspect:
         self.data = []
        
     def startInspection(self):
-        FileManager().getDocumentsInDirectory(self.baseData.get("path"),self.indexPaths,"")
+        try:
+            FileManager().getDocumentsInDirectory(self.baseData.get("path"),self.indexPaths,"")
+        except:
+            print("")
+            print("Error con el archivo índice. Intente nuevamente.")
+            print("")
+            return
         self.readData()
         if self.baseData.get("type")=="ter":
             self.showResultTerm(self.selectData())
