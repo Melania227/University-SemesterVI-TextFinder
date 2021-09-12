@@ -54,6 +54,7 @@ class Inspect:
             print("Resultados inspección del término "+self.baseData.get("data"))
             print("Número de documentos en los que aparece el término: "+ str(result['ni']))
             print("Frecuencia inversa del documento: "+ str(result['idfs']))
+            print("Frecuencia inversa del documento 2: "+ str(result['idfs2']))
             for item in result['postings']:
                 print("-Documento "+self.data[2][item]['ruta']+":")
                 print("Frecuencia: "+ str(result['postings'][item]['freq']))

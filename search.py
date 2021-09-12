@@ -82,7 +82,7 @@ class Search:
                 bisect.insort(self.docScale,(simTempDoc, key))
             else:
                 bisect.insort(self.docScale,(0, key))
-        print(self.docScale)
+        '''print(self.docScale)'''
         self.docScale = list(reversed(self.docScale))
 
 
@@ -111,7 +111,7 @@ class Search:
                         simTempDoc += idf * ((frequencyInDoc*(k+1))/(frequencyInDoc+k*(1-b+b*(documentSize/avgCollection))))
 
             bisect.insort(self.docScale,(simTempDoc, key))
-        print(self.docScale)
+        '''print(self.docScale)'''
         self.docScale = list(reversed(self.docScale))
         
 
@@ -124,8 +124,8 @@ class Search:
             if(sim[0]>0):
                 textForFile+="\t"+str(pos)+"\t\t\t\t"+str(sim[1])+"\t\t\t"+str(sim[0])+"\n"
                 pos+=1
-        print(textForFile)
-        path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/resultados/"+self.baseData['prefix']+".esca"
+        '''print(textForFile)'''
+        path=self.baseData.get("indexPath")+"/"+self.baseData['prefix']+".esca"
         FileManager.writeFile(path,textForFile)
 
     #Funcion que genere el HTML
@@ -134,6 +134,8 @@ class Search:
         dt_string = self.dateTime.strftime("%d/%m/%Y %H:%M:%S")
         prefix = self.baseData['prefix']
         textQuery = self.baseData['literalTextOfQuery']
+        if len(self.docScale)<int(self.baseData['numDocs']):
+            self.baseData['numDocs'] == len(self.docScale)
         docsScale = list(self.docScale)[:int(self.baseData['numDocs'])]
 
         textForFile+= f"""
@@ -153,7 +155,8 @@ class Search:
             <h2>Documentos: </h2>
         </body>
     </html>
-"""
+""" 
+        cont = 1
         for doc in docsScale:
             simTemp = doc[0]
             docIDTemp = doc[1]
@@ -162,12 +165,14 @@ class Search:
 
             textForFile+= f"""
             <h3>ID: {docIDTemp} </h3>
+            <h4>Posición en el escalafón: {cont} </h4>
             <h4>Similitud: {simTemp} </h4>
             <h4>Primeros 200 caracteres del texto del documento: </h4>
             <p>{docText}</p>
-    """
+    """ 
+            cont+=1
 
-        path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/resultados/"+prefix+".HTML"
+        path=self.baseData.get("indexPath")+"/"+prefix+".HTML"
         FileManager.writeFile(path,textForFile)
 
 

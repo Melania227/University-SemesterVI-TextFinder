@@ -8,6 +8,7 @@ class FileManager:
     
     #Funcion que abre y lee y retorna el texto de un archivo
     def readFile(path):
+        path = path.replace("\\", "/")
         try:
             with open(path, encoding='utf-8') as file:
                 content=file.read()
@@ -21,12 +22,14 @@ class FileManager:
     
     #Funcion que coloca en un archivo toda la informacion que se le indique
     def writeFile(path, text):
+        path = path.replace("\\", "/")
         file = open(path, "w")
         file.write(text)
         file.close()
 
     #Funcion que guarda un diccionario en un archivo
     def writeDictionary(path, name, dict):
+        path = path.replace("\\", "/")
         outfile = open(path+'/'+name, 'wb')
         pickle.dump(dict, outfile)
         outfile.close()
@@ -34,6 +37,7 @@ class FileManager:
 
     #Funcion que lee un diccionario de un archivo
     def readDictionary(path):
+        path = path.replace("\\", "/")
         infile = open(path,'rb')
         new_dict = pickle.load(infile)
         infile.close()
@@ -41,6 +45,7 @@ class FileManager:
 
 
     def getDocumentsInDirectory(self,path,list_,path_):
+        path = path.replace("\\", "/")
         for f in os.listdir(path):
             if os.path.isfile(os.path.join(path, f)):
                 if path_=="":

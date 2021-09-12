@@ -106,7 +106,7 @@ class Index:
                 posting = self.createPosting(dictionary[term])
                 termInCollectionDictionary['postings'][self.collection['N']] =  posting
                 self.collectionDictionary[term]=termInCollectionDictionary
-        
+
 
     def createPosting(self, term):
         postingAux={
@@ -120,11 +120,14 @@ class Index:
         N = self.collection['N']
         for term in self.collectionDictionary:
             ni = self.collectionDictionary[term]['ni']
-            tempIdf = log((N-ni+0.5)/(ni+0.5),10)
+            idf2 = log((N-ni+0.5)/(ni+0.5),2)
+            tempIdf = log((N/ni),2)
             if tempIdf < 0:
                 self.collectionDictionary[term]['idfs'] = 0
+                self.collectionDictionary[term]['idfs2'] = 0
             else:
                 self.collectionDictionary[term]['idfs'] = tempIdf
+                self.collectionDictionary[term]['idfs2'] = idf2
 
     def updateDocuments(self):
         for i in range (1,self.collection.get('N')+1):
@@ -235,8 +238,8 @@ class Index:
 
         wordList = self.stopwords(self.stopwordsList,wordList)
 
-        wordList = self.wordsInTextList(wordList)
-        wordList.sort()
+        '''wordList = self.wordsInTextList(wordList)'''
+        #wordList.sort()
 
         wordIndex = self.wordAppearances(wordList)
         
