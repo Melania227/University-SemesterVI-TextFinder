@@ -3,17 +3,21 @@ import re
 from FileManager import FileManager
 import bisect
 from math import log, sqrt
+from datetime import datetime
 
 class Search:
 
-    def __init__(self, indexPath, type, data, numDocs, query):
+    def __init__(self, indexPath, type, prefix, numDocs, query):
         self.baseData={
             'indexPath': indexPath,
             'type': type,
-            'data': data,
+            'prefix': prefix,
             'numDocs': numDocs,
-            'query': query
+            'query': query,
+            'literalTextOfQuery': query
         }
+
+        self.dateTime = datetime.now()
 
         self.dictionary = {}
         self.collectionInfo = {}
@@ -21,8 +25,6 @@ class Search:
 
         self.indexPaths = []
         self.docScale = [] #Lista de tuples (sim,docID)
-
-        self.query={} #Diccionario con pesos ¿se necesita?
         
         print(self.processQuery())
     
@@ -36,14 +38,18 @@ class Search:
         
         if (self.baseData['type']=="vec"):
             self.searchByVectorial()
+            self.generateFile()
+            self.generateHTML()
         else:
             self.searchByBM25()
+            self.generateFile()
+            self.generateHTML()
 
     #Funcion principal para la busqueda vectorial
     def searchByVectorial(self):
         FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
         #Vamos a ir documento por documento: del 1 al número que nos dieron como entrada
-        keys = list(self.documentsInfo.keys())[:int(self.baseData['numDocs'])]
+        keys = list(self.documentsInfo.keys())
         queryNorm = self.getQueryNorm()
         for key in keys:
             sumProdWeights = 0 
@@ -64,11 +70,11 @@ class Search:
                 print("NORMA DEL DOC " + str(self.documentsInfo[key]['norma']))
                 print("NORMA DE LA CONSULTA " + str(queryNorm))
                 simTempDoc = (sumProdWeights/(queryNorm*self.documentsInfo[key]['norma']))
-                bisect.insort(self.docScale,(simTempDoc, "d"+str(key)))
+                bisect.insort(self.docScale,(simTempDoc, key))
             else:
-                bisect.insort(self.docScale,(0, "d"+str(key)))
+                bisect.insort(self.docScale,(0, key))
         print(self.docScale)
-
+        self.docScale = list(reversed(self.docScale))
 
 
 
@@ -78,7 +84,7 @@ class Search:
     def searchByBM25(self):
         FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
         #Vamos a ir documento por documento: del 1 al número que nos dieron como entrada
-        keys = list(self.documentsInfo.keys())[:int(self.baseData['numDocs'])]
+        keys = list(self.documentsInfo.keys())
         k=1.2
         b=0.75
         for key in keys:
@@ -95,9 +101,61 @@ class Search:
                         ni = self.dictionary[word]['ni']
                         simTempDoc += idf * ((frequencyInDoc*(k+1))/(frequencyInDoc+k*(1-b+b*(documentSize/avgCollection))))
 
-            bisect.insort(self.docScale,(simTempDoc, "d"+str(key)))
+            bisect.insort(self.docScale,(simTempDoc, key))
         print(self.docScale)
+        self.docScale = list(reversed(self.docScale))
         
+
+    #Funcion que genere el archivo de salida
+    def generateFile(self):
+        textForFile=""
+        textForFile+="ESCALAFÓN:\n\tPosición\t|\tDocID\t|\tValor de Similitud\n"
+        pos=1
+        for sim in self.docScale:
+            if(sim[0]>0):
+                textForFile+="\t"+str(pos)+"\t\t\t\t"+str(sim[1])+"\t\t\t"+str(sim[0])+"\n"
+                pos+=1
+        print(textForFile)
+        path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/resultados/"+self.baseData['prefix']+".esca"
+        FileManager.writeFile(path,textForFile)
+
+    #Funcion que genere el HTML
+    def generateHTML(self):
+        textForFile=""
+        dt_string = self.dateTime.strftime("%d/%m/%Y %H:%M:%S")
+        prefix = self.baseData['prefix']
+        textQuery = self.baseData['literalTextOfQuery']
+        docsScale = list(self.docScale)[:int(self.baseData['numDocs'])]
+
+        textForFile+= f"""
+<!DOCTYPE html>
+
+    <html>
+        <head>
+            <title>{prefix}</title>
+        </head>
+
+        <body>
+            <h1>Consulta: </h1> <p>{textQuery}</p>
+            <h2>Momento de realización: </h2> <p>{dt_string}</p>
+
+            <br>
+
+            <h2>Documentos: </h2>
+        </body>
+    </html>
+"""
+        for doc in docsScale:
+            simTemp = doc[0]
+            docIDTemp = doc[1]
+            textForFile+= f"""
+            <h3>ID: {docIDTemp} </h3>
+            <h4>Similitud: {simTemp} </h4>
+    """
+
+        path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/resultados/"+prefix+".HTML"
+        FileManager.writeFile(path,textForFile)
+
 
     #FUNCIONES SECUNDARIAS:
 
