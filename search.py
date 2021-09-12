@@ -26,11 +26,17 @@ class Search:
         self.indexPaths = []
         self.docScale = [] #Lista de tuples (sim,docID)
         
-        print(self.processQuery())
+        '''print(self.processQuery())'''
     
     #Funcion principal
     def searching(self):
-        FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
+        try:
+            FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
+        except:
+            print("")
+            print("Error con el directorio índice. Intente nuevamente.")
+            print("")
+            return
         self.baseData['query'] = self.processQuery()
         self.dictionary = FileManager.readDictionary(self.baseData['indexPath']+'/Dictionary Terms.txt')
         self.collectionInfo = FileManager.readDictionary(self.baseData['indexPath']+'/Collection Information.txt')
@@ -44,6 +50,9 @@ class Search:
             self.searchByBM25()
             self.generateFile()
             self.generateHTML()
+        print("")
+        print("Busqueda completada.") 
+        print("")
 
     #Funcion principal para la busqueda vectorial
     def searchByVectorial(self):
@@ -65,10 +74,10 @@ class Search:
                         sumProdWeights += weightQueryWord*weightQueryInDoc
 
             if(isInDictionary):
-                print("PARA EL DOC " + str(key))
+                '''print("PARA EL DOC " + str(key))
                 print("SUMA PRODUCTO " + str(sumProdWeights))
                 print("NORMA DEL DOC " + str(self.documentsInfo[key]['norma']))
-                print("NORMA DE LA CONSULTA " + str(queryNorm))
+                print("NORMA DE LA CONSULTA " + str(queryNorm))'''
                 simTempDoc = (sumProdWeights/(queryNorm*self.documentsInfo[key]['norma']))
                 bisect.insort(self.docScale,(simTempDoc, key))
             else:
@@ -136,8 +145,8 @@ class Search:
         </head>
 
         <body>
-            <h1>Consulta: </h1> <p>{textQuery}</p>
-            <h2>Momento de realización: </h2> <p>{dt_string}</p>
+            <h1>Consulta: "{textQuery}"</h1>
+            <h2>Momento de realización: {dt_string}</h2>
 
             <br>
 
@@ -148,9 +157,14 @@ class Search:
         for doc in docsScale:
             simTemp = doc[0]
             docIDTemp = doc[1]
+
+            docText = self.getTextFromDoc(docIDTemp)
+
             textForFile+= f"""
             <h3>ID: {docIDTemp} </h3>
             <h4>Similitud: {simTemp} </h4>
+            <h4>Primeros 200 caracteres del texto del documento: </h4>
+            <p>{docText}</p>
     """
 
         path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/resultados/"+prefix+".HTML"
@@ -158,6 +172,21 @@ class Search:
 
 
     #FUNCIONES SECUNDARIAS:
+
+    #Funcion que trae las primeras 200 lineas de un texto
+    def getTextFromDoc(self, docIDTemp):
+        path = self.collectionInfo['ruta']
+        path += "/" + self.documentsInfo[docIDTemp]['ruta']
+        
+        #Text Input
+        text = FileManager.readFile(path)
+
+        #Text format
+        text = self.deleteTags(text)
+
+        text = re.sub('\n',' ',text)
+
+        return text[:200]
 
     #Funcion que saca la norma de la consulta
     def getQueryNorm(self):
@@ -167,7 +196,7 @@ class Search:
                 frequencyInCons = self.baseData['query'][word]
                 ni = self.dictionary[word]['ni']
                 weightQueryWord = log((1+frequencyInCons),2) * log((self.collectionInfo['N']/ni),2)
-                print("Peso de la consulta " + str(weightQueryWord))
+                '''print("Peso de la consulta " + str(weightQueryWord))'''
                 weightQueryForNorm += weightQueryWord**2
         weightQueryForNorm = sqrt(weightQueryForNorm)
         return weightQueryForNorm
@@ -200,6 +229,10 @@ class Search:
     #Funcion que toma una lista de palabras y nos devuelve un diccionario que contiene cada palabra y la cantidad de veces que aparece
     def wordAppearances(self, list):
         return Counter(list)
+
+    #Funcion que elimina los tags XML del texto y los cambia por un espacio en blanco
+    def deleteTags(self, text):
+        return re.sub('\<(.*?)\>',' ',text)
 
     #Funcion que procesa la consulta y nos devuelve una lista con las palabras de la consulta
     def processQuery(self):
