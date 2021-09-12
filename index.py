@@ -77,11 +77,11 @@ class Index:
 
         self.generateIndexDocuments(resultsPath)
 
-        #print (self.collection)
-        #print("///////////////////////////////////////////////////////////")
-        #print (self.documents)
+        print (self.collection)
         print("///////////////////////////////////////////////////////////")
-        #print(self.collectionDictionary)
+        print (self.documents)
+        print("///////////////////////////////////////////////////////////")
+        print(self.collectionDictionary)
 
     def updateCollectionDictionary(self, dictionary, keys):
         for term in keys:
