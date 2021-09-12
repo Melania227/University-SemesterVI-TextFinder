@@ -1,3 +1,4 @@
+from collections import Counter
 import re
 from FileManager import FileManager
 import bisect
@@ -43,7 +44,6 @@ class Search:
         FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
         #Vamos a ir documento por documento: del 1 al número que nos dieron como entrada
         keys = list(self.documentsInfo.keys())[:int(self.baseData['numDocs'])]
-        print(keys)
         for key in keys:
             weightQueryForNorm=0
             sumProdWeights = 0 
@@ -52,9 +52,9 @@ class Search:
                 if word in self.dictionary:
                     if key in self.dictionary[word]['postings']:
                         isInDictionary=True
-                        frequencyInDoc = self.dictionary[word]['postings'][key]['freq']
+                        frequencyInCons = self.baseData['query'][word]
                         ni = self.dictionary[word]['ni']
-                        weightQueryWord = log((1+frequencyInDoc),2) * log((self.collectionInfo['N']/ni),2)
+                        weightQueryWord = log((1+frequencyInCons),2) * log((self.collectionInfo['N']/ni),2)
                         weightQueryForNorm += weightQueryWord**2
                         weightQueryInDoc = self.dictionary[word]['postings'][key]['peso']
                         sumProdWeights += weightQueryWord*weightQueryInDoc
@@ -127,6 +127,10 @@ class Search:
     def splitText(self, text):
         return text.split()
 
+    #Funcion que toma una lista de palabras y nos devuelve un diccionario que contiene cada palabra y la cantidad de veces que aparece
+    def wordAppearances(self, list):
+        return Counter(list)
+
     #Funcion que procesa la consulta y nos devuelve una lista con las palabras de la consulta
     def processQuery(self):
         #Text format
@@ -143,4 +147,6 @@ class Search:
 
         wordList = self.wordsInTextList(wordList)
         wordList.sort()
-        return wordList
+
+        wordIndex = self.wordAppearances(wordList)
+        return wordIndex
