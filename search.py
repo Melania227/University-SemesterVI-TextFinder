@@ -66,6 +66,8 @@ class Search:
                 print("LO QUE DA 0 " + str(queryNorm*self.documentsInfo[key]['norma']))
                 simTempDoc = (sumProdWeights/(queryNorm*self.documentsInfo[key]['norma']))
                 bisect.insort(self.docScale,(simTempDoc, "d"+str(key)))
+            else:
+                bisect.insort(self.docScale,(0, "d"+str(key)))
         print(self.docScale)
 
 
@@ -75,8 +77,27 @@ class Search:
 
     #Funcion principal para la busqueda con BM25
     def searchByBM25(self):
-        FileManager().getDocumentsInDirectory(self.baseData.get("path"),self.indexPaths,"")
-        self.readData()
+        FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
+        #Vamos a ir documento por documento: del 1 al número que nos dieron como entrada
+        keys = list(self.documentsInfo.keys())[:int(self.baseData['numDocs'])]
+        k=1.2
+        b=0.75
+        for key in keys:
+            documentSize = self.documentsInfo[key]['longuitud']
+            avgCollection = self.collectionInfo['avgLen']
+            #isInDictionary=False
+            simTempDoc = 0
+            for word in self.baseData['query']:
+                if word in self.dictionary:
+                    if key in self.dictionary[word]['postings']:
+                        #isInDictionary=True
+                        frequencyInDoc = self.dictionary[word]['postings'][key]['freq']
+                        idf = frequencyInDoc = self.dictionary[word]['idfs']
+                        ni = self.dictionary[word]['ni']
+                        simTempDoc += idf * ((frequencyInDoc*(k+1))/(frequencyInDoc+k*(1-b+b*(documentSize/avgCollection))))
+
+            bisect.insort(self.docScale,(simTempDoc, "d"+str(key)))
+        print(self.docScale)
         
 
     #FUNCIONES SECUNDARIAS:
