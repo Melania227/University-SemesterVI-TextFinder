@@ -31,7 +31,8 @@ class Index:
     def processCollection(self, path, resultsPath, stopWordsPath):
         #path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas"
         paths = FileManager().getDocumentsInDirectory(path,[],"")
-        
+        regex = re.compile(r'.*\.xml')
+        paths = [ele for ele in paths if regex.match(ele)]
         for p in paths:
             dictionary = self.dictionaryOfDocument(path+"/"+p, stopWordsPath)
             keysOfDictionary = sorted(dictionary.keys())
