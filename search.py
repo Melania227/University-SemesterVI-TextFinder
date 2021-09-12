@@ -3,6 +3,7 @@ import re
 from FileManager import FileManager
 import bisect
 from math import log, sqrt
+from datetime import datetime
 
 class Search:
 
@@ -12,8 +13,11 @@ class Search:
             'type': type,
             'prefix': prefix,
             'numDocs': numDocs,
-            'query': query
+            'query': query,
+            'literalTextOfQuery': query
         }
+
+        self.dateTime = datetime.now()
 
         self.dictionary = {}
         self.collectionInfo = {}
@@ -21,8 +25,6 @@ class Search:
 
         self.indexPaths = []
         self.docScale = [] #Lista de tuples (sim,docID)
-
-        self.query={} #Diccionario con pesos ¿se necesita?
         
         print(self.processQuery())
     
@@ -37,9 +39,11 @@ class Search:
         if (self.baseData['type']=="vec"):
             self.searchByVectorial()
             self.generateFile()
+            self.generateHTML()
         else:
             self.searchByBM25()
             self.generateFile()
+            self.generateHTML()
 
     #Funcion principal para la busqueda vectorial
     def searchByVectorial(self):
@@ -116,7 +120,41 @@ class Search:
         FileManager.writeFile(path,textForFile)
 
     #Funcion que genere el HTML
+    def generateHTML(self):
+        textForFile=""
+        dt_string = self.dateTime.strftime("%d/%m/%Y %H:%M:%S")
+        prefix = self.baseData['prefix']
+        textQuery = self.baseData['literalTextOfQuery']
+        docsScale = list(self.docScale)[:int(self.baseData['numDocs'])]
 
+        textForFile+= f"""
+<!DOCTYPE html>
+
+    <html>
+        <head>
+            <title>{prefix}</title>
+        </head>
+
+        <body>
+            <h1>Consulta: </h1> <p>{textQuery}</p>
+            <h2>Momento de realización: </h2> <p>{dt_string}</p>
+
+            <br>
+
+            <h2>Documentos: </h2>
+        </body>
+    </html>
+"""
+        for doc in docsScale:
+            simTemp = doc[0]
+            docIDTemp = doc[1]
+            textForFile+= f"""
+            <h3>ID: {docIDTemp} </h3>
+            <h4>Similitud: {simTemp} </h4>
+    """
+
+        path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/resultados/"+prefix+".HTML"
+        FileManager.writeFile(path,textForFile)
 
 
     #FUNCIONES SECUNDARIAS:
