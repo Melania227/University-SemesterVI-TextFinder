@@ -43,10 +43,20 @@ def indizacionMenu():
     print("Colección -> ruta del directorio raíz")
     print("Stopwords -> ruta del archivo que contiene la lista de palabras que se deben omitir")
     print("Índice  -> ruta del directorio en que se almacenará los archivos generados")
+    print("Igualmente puedes ingresar 'Volver' para regresar al menú principal")
     command = input("Ingrese el comando: ")
+    if command == "Volver":
+        print("")
+        return menu()
     parts = shlex.split(command)
-    Index().processCollection(parts[1], parts[3], parts[2]) if validate(parts,1) else print("Error")
-    return menu()
+    if validate(parts,1):
+        Index().processCollection(parts[1], parts[3], parts[2])
+        return menu()
+    else:
+        print("")
+        print("Error en comando. Intente nuevamente.")
+        print("")
+        return indizacionMenu()
 
 def busquedaMenu():
     print("¡Bienvenido a la herramienta de Búsqueda!")
@@ -57,10 +67,21 @@ def busquedaMenu():
     print("Prefijo  -> prefijo usado con todos los archivos de salida producidos por este comando")
     print("NumDocs  -> cantidad de los primeros documentos del escalafón que serán mostrados en un archivo HTML")
     print("Consulta  -> texto de la consulta")
+    print("Igualmente puedes ingresar 'Volver' para regresar al menú principal")
     command = input("Ingrese el comando: ")
+    if command == "Volver":
+        print("")
+        return menu()
     parts = shlex.split(command)
-    Search(parts[1], parts[2], parts[3], parts[4], parts[5]).searching() if validate(parts,2) else print("Error")
-    return menu()
+    if validate(parts,2):
+        Search(parts[1], parts[2], parts[3], parts[4], parts[5]).searching() 
+        return menu()
+    else:
+        print("")
+        print("Error en comando. Intente nuevamente.")
+        print("")
+        return busquedaMenu()
+    
 
 def inspeccionMenu():
     print("¡Bienvenido a la herramienta de Inspección!")
@@ -69,16 +90,27 @@ def inspeccionMenu():
     print("Índice -> ruta del directorio en que se contiene los archivos que componen el índice usado")
     print("Tipo -> término (ter) o documento (doc)")
     print("Dato   -> ruta del archivo o el término que se quiere buscar")
+    print("Igualmente puedes ingresar 'Volver' para regresar al menú principal")
     command = input("Ingrese el comando: ")
+    if command == "Volver":
+        print("")
+        return menu()
     parts = shlex.split(command)
-    Inspect(parts[1],parts[2],parts[3]).startInspection()
-    return menu()
+    if validate(parts,3):
+        Inspect(parts[1],parts[2],parts[3]).startInspection()
+        return menu()
+    else:
+        print("")
+        print("Error en comando. Intente nuevamente.")
+        print("")
+        return inspeccionMenu()
 
 def validate(cmd, type): 
     if type == 1:
         return True if (cmd[0] == "indizar" and len(cmd)==4) else False
     elif type == 2:
-        return True if (cmd[0] == "buscar" and len(cmd)==6) else False 
+        validWords = ["vec","bm25"]
+        return True if (cmd[0] == "buscar" and len(cmd)==6 and cmd[2] in validWords) else False 
     else:
         validWords = ["doc","ter"]
         return True if (cmd[0] == "mostrar" and len(cmd)==4 and cmd[2] in validWords) else False      

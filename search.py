@@ -26,11 +26,17 @@ class Search:
         self.indexPaths = []
         self.docScale = [] #Lista de tuples (sim,docID)
         
-        print(self.processQuery())
+        '''print(self.processQuery())'''
     
     #Funcion principal
     def searching(self):
-        FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
+        try:
+            FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
+        except:
+            print("")
+            print("Error con el directorio índice. Intente nuevamente.")
+            print("")
+            return
         self.baseData['query'] = self.processQuery()
         self.dictionary = FileManager.readDictionary(self.baseData['indexPath']+'/Dictionary Terms.txt')
         self.collectionInfo = FileManager.readDictionary(self.baseData['indexPath']+'/Collection Information.txt')
@@ -44,6 +50,9 @@ class Search:
             self.searchByBM25()
             self.generateFile()
             self.generateHTML()
+        print("")
+        print("Busqueda completada.") 
+        print("")
 
     #Funcion principal para la busqueda vectorial
     def searchByVectorial(self):
@@ -65,10 +74,10 @@ class Search:
                         sumProdWeights += weightQueryWord*weightQueryInDoc
 
             if(isInDictionary):
-                print("PARA EL DOC " + str(key))
+                '''print("PARA EL DOC " + str(key))
                 print("SUMA PRODUCTO " + str(sumProdWeights))
                 print("NORMA DEL DOC " + str(self.documentsInfo[key]['norma']))
-                print("NORMA DE LA CONSULTA " + str(queryNorm))
+                print("NORMA DE LA CONSULTA " + str(queryNorm))'''
                 simTempDoc = (sumProdWeights/(queryNorm*self.documentsInfo[key]['norma']))
                 bisect.insort(self.docScale,(simTempDoc, key))
             else:
@@ -187,7 +196,7 @@ class Search:
                 frequencyInCons = self.baseData['query'][word]
                 ni = self.dictionary[word]['ni']
                 weightQueryWord = log((1+frequencyInCons),2) * log((self.collectionInfo['N']/ni),2)
-                print("Peso de la consulta " + str(weightQueryWord))
+                '''print("Peso de la consulta " + str(weightQueryWord))'''
                 weightQueryForNorm += weightQueryWord**2
         weightQueryForNorm = sqrt(weightQueryForNorm)
         return weightQueryForNorm

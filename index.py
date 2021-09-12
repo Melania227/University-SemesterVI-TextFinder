@@ -30,10 +30,15 @@ class Index:
     #Procesa archivo por archivo para crear el archivo invertido y el track de documentos
     def processCollection(self, path, resultsPath, stopWordsPath):
         #path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas"
-        paths = FileManager().getDocumentsInDirectory(path,[],"")
+        try:
+            paths = FileManager().getDocumentsInDirectory(path,[],"")
+        except:
+            print("")
+            print("Error con el directorio Coleccíón. Intente nuevamente.")
+            print("")
+            return
         regex = re.compile(r'.*\.xml')
         paths = [ele for ele in paths if regex.match(ele)]
-        print(paths)
         for p in paths:
             dictionary = self.dictionaryOfDocument(path+"/"+p, stopWordsPath)
             keysOfDictionary = sorted(dictionary.keys())
@@ -77,11 +82,14 @@ class Index:
 
         self.generateIndexDocuments(resultsPath)
 
-        print (self.collection)
+        '''print (self.collection)
         print("///////////////////////////////////////////////////////////")
         print (self.documents)
         print("///////////////////////////////////////////////////////////")
-        print(self.collectionDictionary)
+        print(self.collectionDictionary)'''
+        print("")
+        print("Indización completada.") 
+        print("")
 
     def updateCollectionDictionary(self, dictionary, keys):
         for term in keys:
@@ -142,10 +150,17 @@ class Index:
 
     #Funcion que genera el archivo final con el index
     def generateIndexDocuments(self, path):
-        FileManager.writeDictionary(path, "Collection Information.txt", self.collection)
-        FileManager.writeDictionary(path, "Documents Information.txt", self.documents)
-        FileManager.writeDictionary(path, "Dictionary Terms.txt", self.collectionDictionary)
-        FileManager.writeDictionary(path, "Stopwords.txt", self.stopwordsList)
+        try:
+            FileManager.writeDictionary(path, "Collection Information.txt", self.collection)
+            FileManager.writeDictionary(path, "Documents Information.txt", self.documents)
+            FileManager.writeDictionary(path, "Dictionary Terms.txt", self.collectionDictionary)
+            FileManager.writeDictionary(path, "Stopwords.txt", self.stopwordsList)
+        except:
+            print("")
+            print("Error con la ruta para los archivos generados. Intente nuevamente.")
+            print("")
+            return
+            
 
     #PROCESAMIENTO DEL DOCUMENTO
 
@@ -170,6 +185,8 @@ class Index:
 
     #Eliminar stopwords
     def stopwords(self, stopwordsList, wordList):
+        if stopwordsList is None:
+            return wordList
         for stopWord in stopwordsList:
             while stopWord in wordList: wordList.remove(stopWord)
         return wordList   
@@ -199,8 +216,13 @@ class Index:
     #Funcion que hace el procesamiento de palabras (Termino, frecuencia)
     def dictionaryOfDocument(self, path, stopWordsPath):
         #Text Input
-        text = FileManager.readFile(path)
-
+        try:
+            text = FileManager.readFile(path)
+        except:
+            print("")
+            print("Error con la lectura de un documento en la colección.")
+            print("")
+            return
         #Text format
         text = self.deleteTags(text)
         text = self.deletePunctuation(text)
