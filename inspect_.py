@@ -31,37 +31,38 @@ class Inspect:
         return 0
     
     def selectDoc(self):
-        doc = self.baseData.get("data")
+        doc = self.baseData.get("data").replace("\\", "/")
         for item in self.data[2]:
-            if item == doc:
+            if self.data[2][item]['ruta'] == doc:
+                self.data[2][item]['id']=item
                 return self.data[2][item]
         return 0
 
     def showResultTerm(self, result):
         if result == 0:
             print("")
-            print("////////////////////////////////////")
             print("No se encontraron datos con respecto al término "+self.baseData.get("data"))
+            print("")
         else:
             print("")
-            print("////////////////////////////////////")
             print("Resultados inspección del término "+self.baseData.get("data"))
             print("Número de documentos en los que aparece el término: "+ str(result['ni']))
             print("Frecuencia inversa del documento: "+ str(result['idfs']))
             for item in result['postings']:
-                print("Documento #"+self.data[2][item]['ruta']+":")
-                print("Frecuencia: "+ str(result[item]['postings']['freq']))
-                print("Peso: "+ str(result[item]['postings']['peso']))
+                print("-Documento "+self.data[2][item]['ruta']+":")
+                print("Frecuencia: "+ str(result['postings'][item]['freq']))
+                print("Peso: "+ str(result['postings'][item]['peso']))
+            print("")
     
     def showResultDoc(self, result):
         if result == 0:
             print("")
-            print("////////////////////////////////////")
-            print("No se encontraron datos con respecto al documento "+result['ruta'])
+            print("No se encontraron datos con respecto al documento "+self.baseData.get("data"))
+            print("")
         else:
             print("")
-            print("////////////////////////////////////")
             print("Resultados inspección del documento "+self.baseData.get("data"))
-            print("Id: "+ str(result.keys()))
+            print("Id: "+ str(result['id']))
             print("Longitud: "+ str(result['longuitud']))
             print("Norma: "+ str(result['norma']))
+            print("")
