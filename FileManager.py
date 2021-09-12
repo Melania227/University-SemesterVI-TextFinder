@@ -39,6 +39,7 @@ class FileManager:
         infile.close()
         return new_dict
 
+
     def getDocumentsInDirectory(self,path,list_,path_):
         for f in os.listdir(path):
             if os.path.isfile(os.path.join(path, f)):
