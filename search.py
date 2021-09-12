@@ -6,11 +6,11 @@ from math import log, sqrt
 
 class Search:
 
-    def __init__(self, indexPath, type, data, numDocs, query):
+    def __init__(self, indexPath, type, prefix, numDocs, query):
         self.baseData={
             'indexPath': indexPath,
             'type': type,
-            'data': data,
+            'prefix': prefix,
             'numDocs': numDocs,
             'query': query
         }
@@ -36,8 +36,10 @@ class Search:
         
         if (self.baseData['type']=="vec"):
             self.searchByVectorial()
+            self.generateFile()
         else:
             self.searchByBM25()
+            self.generateFile()
 
     #Funcion principal para la busqueda vectorial
     def searchByVectorial(self):
@@ -64,11 +66,11 @@ class Search:
                 print("NORMA DEL DOC " + str(self.documentsInfo[key]['norma']))
                 print("NORMA DE LA CONSULTA " + str(queryNorm))
                 simTempDoc = (sumProdWeights/(queryNorm*self.documentsInfo[key]['norma']))
-                bisect.insort(self.docScale,(simTempDoc, "d"+str(key)))
+                bisect.insort(self.docScale,(simTempDoc, key))
             else:
-                bisect.insort(self.docScale,(0, "d"+str(key)))
+                bisect.insort(self.docScale,(0, key))
         print(self.docScale)
-
+        self.docScale = list(reversed(self.docScale))
 
 
 
@@ -95,9 +97,27 @@ class Search:
                         ni = self.dictionary[word]['ni']
                         simTempDoc += idf * ((frequencyInDoc*(k+1))/(frequencyInDoc+k*(1-b+b*(documentSize/avgCollection))))
 
-            bisect.insort(self.docScale,(simTempDoc, "d"+str(key)))
+            bisect.insort(self.docScale,(simTempDoc, key))
         print(self.docScale)
+        self.docScale = list(reversed(self.docScale))
         
+
+    #Funcion que genere el archivo de salida
+    def generateFile(self):
+        textForFile=""
+        textForFile+="ESCALAFÓN:\n\tPosición\t|\tDocID\t|\tValor de Similitud\n"
+        pos=1
+        for sim in self.docScale:
+            if(sim[0]>0):
+                textForFile+="\t"+str(pos)+"\t\t\t\t"+str(sim[1])+"\t\t\t"+str(sim[0])+"\n"
+                pos+=1
+        print(textForFile)
+        path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/resultados/"+self.baseData['prefix']+".esca"
+        FileManager.writeFile(path,textForFile)
+
+    #Funcion que genere el HTML
+
+
 
     #FUNCIONES SECUNDARIAS:
 
