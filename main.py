@@ -59,7 +59,7 @@ def busquedaMenu():
     print("Consulta  -> texto de la consulta")
     command = input("Ingrese el comando: ")
     parts = shlex.split(command)
-    Search(parts[1], parts[2], parts[3], parts[4], parts[5]) if validate(parts,2) else print("Error")
+    Search(parts[1], parts[2], parts[3], parts[4], parts[5]).searching() if validate(parts,2) else print("Error")
     return menu()
 
 def inspeccionMenu():

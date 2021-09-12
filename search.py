@@ -1,5 +1,7 @@
 import re
 from FileManager import FileManager
+import bisect
+from math import log, sqrt
 
 class Search:
 
@@ -11,23 +13,70 @@ class Search:
             'numDocs': numDocs,
             'query': query
         }
-        self.indexPaths= []
+
+        self.dictionary = {}
+        self.collectionInfo = {}
+        self.documentsInfo = {}
+
+        self.indexPaths = []
+        self.docScale = [] #Lista de tuples (sim,docID)
+
+        self.query={} #Diccionario con pesos ¿se necesita?
+        
         print(self.processQuery())
     
+    #Funcion principal
+    def searching(self):
+        FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
+        self.baseData['query'] = self.processQuery()
+        self.dictionary = FileManager.readDictionary(self.baseData['indexPath']+'/Dictionary Terms.txt')
+        self.collectionInfo = FileManager.readDictionary(self.baseData['indexPath']+'/Collection Information.txt')
+        self.documentsInfo = FileManager.readDictionary(self.baseData['indexPath']+'/Documents Information.txt')
+        
+        if (self.baseData['type']=="vec"):
+            self.searchByVectorial()
+        else:
+            self.searchByBM25()
+
     #Funcion principal para la busqueda vectorial
     def searchByVectorial(self):
-        FileManager().getDocumentsInDirectory(self.baseData.get("path"),self.indexPaths,"")
-        self.baseData['query'] = self.processQuery()
-        
+        FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
+        #Vamos a ir documento por documento: del 1 al número que nos dieron como entrada
+        keys = list(self.documentsInfo.keys())[:int(self.baseData['numDocs'])]
+        print(keys)
+        for key in keys:
+            weightQueryForNorm=0
+            sumProdWeights = 0 
+            isInDictionary=False
+            for word in self.baseData['query']:
+                if word in self.dictionary:
+                    if key in self.dictionary[word]['postings']:
+                        isInDictionary=True
+                        frequencyInDoc = self.dictionary[word]['postings'][key]['freq']
+                        ni = self.dictionary[word]['ni']
+                        weightQueryWord = log((1+frequencyInDoc),2) * log((self.collectionInfo['N']/ni),2)
+                        weightQueryForNorm += weightQueryWord**2
+                        weightQueryInDoc = self.dictionary[word]['postings'][key]['peso']
+                        sumProdWeights += weightQueryWord*weightQueryInDoc
+
+            if(isInDictionary):
+                queryNorm = sqrt(weightQueryForNorm)
+                print("NORMA DE LA CONSULTA " + str(queryNorm))
+                print("NORMA DEL DOC " + str(self.documentsInfo[key]['norma']))
+                print("LO QUE DA 0 " + str(queryNorm*self.documentsInfo[key]['norma']))
+                simTempDoc = (sumProdWeights/(queryNorm*self.documentsInfo[key]['norma']))
+                bisect.insort(self.docScale,(simTempDoc, "d"+str(key)))
+        print(self.docScale)
+
+
+
+
+
 
     #Funcion principal para la busqueda con BM25
     def searchByBM25(self):
         FileManager().getDocumentsInDirectory(self.baseData.get("path"),self.indexPaths,"")
         self.readData()
-
-    def readData(self):
-        for item in self.indexPaths:
-            print(FileManager.readDictionary(self.baseData.get("path")+"/"+item))
         
 
     #FUNCIONES SECUNDARIAS:
