@@ -136,8 +136,8 @@ class Search:
         </head>
 
         <body>
-            <h1>Consulta: </h1> <p>{textQuery}</p>
-            <h2>Momento de realización: </h2> <p>{dt_string}</p>
+            <h1>Consulta: "{textQuery}"</h1>
+            <h2>Momento de realización: {dt_string}</h2>
 
             <br>
 
@@ -148,9 +148,14 @@ class Search:
         for doc in docsScale:
             simTemp = doc[0]
             docIDTemp = doc[1]
+
+            docText = self.getTextFromDoc(docIDTemp)
+
             textForFile+= f"""
             <h3>ID: {docIDTemp} </h3>
             <h4>Similitud: {simTemp} </h4>
+            <h4>Primeros 200 caracteres del texto del documento: </h4>
+            <p>{docText}</p>
     """
 
         path="C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/resultados/"+prefix+".HTML"
@@ -158,6 +163,21 @@ class Search:
 
 
     #FUNCIONES SECUNDARIAS:
+
+    #Funcion que trae las primeras 200 lineas de un texto
+    def getTextFromDoc(self, docIDTemp):
+        path = self.collectionInfo['ruta']
+        path += "/" + self.documentsInfo[docIDTemp]['ruta']
+        
+        #Text Input
+        text = FileManager.readFile(path)
+
+        #Text format
+        text = self.deleteTags(text)
+
+        text = re.sub('\n',' ',text)
+
+        return text[:200]
 
     #Funcion que saca la norma de la consulta
     def getQueryNorm(self):
@@ -200,6 +220,10 @@ class Search:
     #Funcion que toma una lista de palabras y nos devuelve un diccionario que contiene cada palabra y la cantidad de veces que aparece
     def wordAppearances(self, list):
         return Counter(list)
+
+    #Funcion que elimina los tags XML del texto y los cambia por un espacio en blanco
+    def deleteTags(self, text):
+        return re.sub('\<(.*?)\>',' ',text)
 
     #Funcion que procesa la consulta y nos devuelve una lista con las palabras de la consulta
     def processQuery(self):
