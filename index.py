@@ -209,7 +209,6 @@ class Index:
         wordList = self.splitText(text)
 
         self.stopwordsList = self.getStopwords(stopWordsPath)
-        
         #stopwordsList = self.getStopwords("C:/Users/Laptop/OneDrive/Documentos/Sexto Semestre/RECUPERACION DE INFORMACION TEXTUAL/terms.txt")
         #stopwordsList = self.getStopwords("C:/Users/melan/OneDrive/6. TEC-SEXTO SEMESTRE/RECUPERACION DE INFORMACION TEXTUAL/PROYECTO 1/pruebas/stopwords.txt")
 

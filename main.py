@@ -2,6 +2,7 @@ import shlex
 from index import Index
 from shlex import split
 from inspect_ import Inspect
+from search import Search
 from FileManager import FileManager
 
 #index = Index()
@@ -58,7 +59,7 @@ def busquedaMenu():
     print("Consulta  -> texto de la consulta")
     command = input("Ingrese el comando: ")
     parts = shlex.split(command)
-    Index().processCollection(parts[1], parts[1], parts[3]) if validate(parts,2) else print("Error")
+    Search(parts[1], parts[2], parts[3], parts[4], parts[5]).searching() if validate(parts,2) else print("Error")
     return menu()
 
 def inspeccionMenu():
