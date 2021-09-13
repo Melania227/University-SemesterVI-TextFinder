@@ -19,6 +19,10 @@ class Inspect:
             print("Error con el archivo índice. Intente nuevamente.")
             print("")
             return
+        print(self.indexPaths)
+        names = ['Collection Information.txt', 'Dictionary Terms.txt', 'Documents Information.txt', 'Stopwords.txt']
+        self.indexPaths = [item for item in self.indexPaths if item in names]
+        print(self.indexPaths)
         self.readData()
         if self.baseData.get("type")=="ter":
             self.showResultTerm(self.selectData())
