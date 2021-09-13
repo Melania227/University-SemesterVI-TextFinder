@@ -81,7 +81,6 @@ class Search:
         FileManager().getDocumentsInDirectory(self.baseData.get("indexPath"),self.indexPaths,"")
         #Vamos a ir documento por documento: del 1 al número que nos dieron como entrada
         keys = list(self.documentsInfo.keys())
-        print("ESTOS SON LOS DOCS" + keys)
         k=1.2
         b=0.75
         for key in keys:
